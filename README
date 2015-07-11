@@ -1,0 +1,11 @@
+aether aetheryang@gmail.com
+
+如不能直接运行请：
+    sh onemake.sh
+编译需要 qt
+-----------------
+
+TODO:
+1 suffix
+2 4Gb
+3 reduce speed to avoid disk sleep
