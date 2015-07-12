@@ -19,8 +19,7 @@ class MainWindow:public QWidget
 	void pfresh ();
   public:
   QListWidget *list_right, *list_left;
-  QCheckBox *c_suffix;
-  QCheckBox *c_4gb;
+  QCheckBox *c_suffix, *c_4gb;
   QProgressBar *progress;
   QStringList showfile();
   void toggle(QString filename);
