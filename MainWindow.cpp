@@ -8,14 +8,6 @@
 #include"toggle_file.cpp"
 using namespace std;
 
-
-void MainWindow::toggle(QString filename)
-{
-  toggle_burst(filename);
-  return;
-}
-
-
 void MainWindow::s_add_dir() {
   QFileDialog *dialog = new QFileDialog( this);
   dialog->setFileMode( QFileDialog::Directory);
@@ -47,11 +39,17 @@ void MainWindow::s_set_output() {
   if (dialog->exec())
     filenames = dialog->selectedFiles();
   output = filenames.join("");
-  if(output == "")
+  if(output == QDir::currentPath()) {
+    c_suffix->setChecked(1);
+    c_suffix->setEnabled(0);
+  }
+  if(output == "") {
+    pb_toggle->setEnabled(0);
     label->setText("output not seted");
+  }
   else
-    label->setText(output);
-  cout << output.toStdString() << endl;
+    pb_toggle->setEnabled(1);
+  label->setText(output);
 }
 
 void MainWindow::s_4gb_checked(int state) {
@@ -60,14 +58,19 @@ void MainWindow::s_4gb_checked(int state) {
     c_suffix->setEnabled(0);
   }
   else
-    c_suffix->setEnabled(1);
+    return;
+    //c_suffix->setEnabled(1);
 }
 
 void MainWindow::s_toggle() {
   int i;
   for( i = 0; i < list_right->count(); i++) {
     QString filename(list_right->item(i)->text());
-    toggle(filename);
+    if(c_4gb->isChecked())
+      toggle_4gb(filename);
+    else
+      toggle_transfer(filename);
+  return;
   }
   cout << "toggle finished" << endl;
 }
@@ -106,11 +109,14 @@ MainWindow::MainWindow ()
   //QPushButton *run     = new QPushButton("&Run", this);
   QPushButton *pb_about     = new QPushButton("&About", this);
   QPushButton *pb_set_output  = new QPushButton("Set output", this);
-  QPushButton *pb_toggle = new QPushButton("&Toggle", this);
+  pb_toggle = new QPushButton("&Toggle", this);
+  //pb_toggle->setEnabled(0);
   label = new QLabel("file out to:");
   c_suffix = new QCheckBox("suffix", this);
   c_4gb = new QCheckBox("4gblimt", this);
-  c_suffix->setChecked(0);
+  c_suffix->setChecked(1);
+  c_4gb->setChecked(1);
+  c_suffix->setEnabled(0);
   list_right = new QListWidget;
   list_left = new QListWidget;
   QStringList list = showfile(QDir::currentPath());

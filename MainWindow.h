@@ -36,6 +36,7 @@ class MainWindow:public QWidget
   public:
   QListWidget *list_right, *list_left;
   QCheckBox *c_suffix, *c_4gb;
+  QPushButton *pb_toggle;
   QProgressBar *progress;
   QLabel* label;
   QString output;
@@ -43,10 +44,10 @@ class MainWindow:public QWidget
 
   QStringList showfile( QString path);
   QString set_suffix(QString filename);
-  void toggle(QString filename);
-  void toggle_out(QString filename);
-  void toggle_burst(QString filename);
-  void toggle_4gb(QString filename);
+  void toggle       (QString filename);
+  void toggle_transfer(QString filename);
+  void toggle_4gb   (QString filename);
+  void toggle_back   (QString filename);
   public slots:
   void s_add_dir();
   void s_add_file();

@@ -18,10 +18,8 @@ QString MainWindow::set_suffix(QString filename) {
     filename.append( ".t0");
   return filename;
 }
-void MainWindow::toggle_burst(QString filename)
+void MainWindow::toggle(QString filename)
 {
-    toggle_4gb(filename);
-    return;
     char readbyte,readbuff[1024];
     int burst_len = 1024;
     qint64 file_size, i, loc = 0,stream_len = 1;
@@ -42,7 +40,7 @@ void MainWindow::toggle_burst(QString filename)
     }
     qfile.close();
 }
-void MainWindow::toggle_out(QString filename)
+void MainWindow::toggle_transfer(QString filename)
 {
   char readbyte,readbuff[1024];
   int burst_len = 1024;
@@ -52,6 +50,8 @@ void MainWindow::toggle_out(QString filename)
     ERRORLIST << filename + " open failed";
     return;
   }
+  if(c_suffix->isChecked())
+    filename.append(".t0");
   QFile qout(output + filename);
   if(!qout.open( QIODevice::WriteOnly)) {
     ERRORLIST << filename + " open failed";
@@ -104,4 +104,35 @@ void MainWindow::toggle_4gb(QString filename)
       break;
   }
   qin.close();
+}
+
+void MainWindow::toggle_back(QString filename)
+{
+  QString suffix[16] = { ".t0", ".t1", ".t2", ".t3", ".t4", ".t5", ".t6", ".t7"\
+                         ".t8", ".t9", ".ta", ".tb", ".tc", ".td", ".te", ".tf"};
+  char readbuff[1024];
+  int burst_len = 1024;
+  qint64 file_size, file_num, i, loc = 0,stream_len = 1;
+  QFile qout(output + filename.remove(-3, 3));
+  if(!qout.open( QIODevice::WriteOnly)) {
+    ERRORLIST << filename + " open failed";
+    return;
+  }
+  for( file_num = 0; file_num < 16; file_num ++) {
+    QFile qin(filename + suffix[file_num]);
+    if(!qin.open( QIODevice::ReadOnly)) {
+      ERRORLIST << filename + " open failed";
+      return;
+    }
+    file_size += qin.size();
+    for(; stream_len;) {
+      stream_len = qin.read( readbuff, burst_len);
+      i = stream_len;
+      while(i) { readbuff[--i] ^= 0xff;}
+      loc += qout.write( readbuff, stream_len);
+      progress->setValue ((loc)*100.0/file_size);
+    }
+    qin.close();
+  }
+  qout.close();
 }
