@@ -8,13 +8,6 @@
 #include"toggle_file.cpp"
 using namespace std;
 
-QStringList MainWindow::showfile() {
-  QDir dir;
-  dir.setFilter( QDir::Files | QDir::Hidden | QDir::NoSymLinks );
-  dir.setSorting( QDir::Name | QDir::Reversed );
-  QStringList list = dir.entryList();
-  return list;
-}
 
 void MainWindow::toggle(QString filename)
 {
@@ -23,7 +16,27 @@ void MainWindow::toggle(QString filename)
 }
 
 
-void MainWindow::s_scan(QListWidgetItem *item) {
+void MainWindow::s_add_dir() {
+  QFileDialog *dialog = new QFileDialog( this);
+  dialog->setFileMode( QFileDialog::Directory);
+  QStringList filenames;
+  if (dialog->exec())
+    filenames = dialog->selectedFiles();
+  QString path;
+  path = filenames.join("");
+  if(path == "")
+    return;
+  QStringList list = showfile(path);
+  list_left->addItems( list );
+}
+
+void MainWindow::s_add_file() {
+  QFileDialog *dialog = new QFileDialog( this);
+  dialog->setFileMode( QFileDialog::ExistingFiles);
+  QStringList filenames;
+  if (dialog->exec())
+    filenames = dialog->selectedFiles();
+  list_right->addItems(filenames);
 }
 
 void MainWindow::s_set_output() {
@@ -34,7 +47,10 @@ void MainWindow::s_set_output() {
   if (dialog->exec())
     filenames = dialog->selectedFiles();
   output = filenames.join("");
-  label->setText(output);
+  if(output == "")
+    label->setText("output not seted");
+  else
+    label->setText(output);
   cout << output.toStdString() << endl;
 }
 
@@ -66,7 +82,7 @@ void MainWindow::slot_right_to_left(QListWidgetItem *item) {
   list_left->addItem(item);
 }
 
-void MainWindow::s_run() {}
+void MainWindow::s_about() {}
 void MainWindow::pfresh ()
 {
 }
@@ -85,9 +101,10 @@ MainWindow::MainWindow ()
   resize (1200, 1200);
   slider->setRange (1, 1000);
   slider->setValue (100);
-  QPushButton *scan    = new QPushButton("&Scan", this);
-  QPushButton *run     = new QPushButton("&Run", this);
-  QPushButton *end     = new QPushButton("&End", this);
+  QPushButton *pb_add_dir    = new QPushButton("Add &dir", this);
+  QPushButton *pb_add_file   = new QPushButton("Add &file", this);
+  //QPushButton *run     = new QPushButton("&Run", this);
+  QPushButton *pb_about     = new QPushButton("&About", this);
   QPushButton *pb_set_output  = new QPushButton("Set output", this);
   QPushButton *pb_toggle = new QPushButton("&Toggle", this);
   label = new QLabel("file out to:");
@@ -96,13 +113,14 @@ MainWindow::MainWindow ()
   c_suffix->setChecked(0);
   list_right = new QListWidget;
   list_left = new QListWidget;
-  QStringList list = showfile();
+  QStringList list = showfile(QDir::currentPath());
   list_left->addItems( list );
 
 
-  mainlayout->addWidget (scan,      0, 0, 1, 1, 0);
-  mainlayout->addWidget (run,       0, 1, 1, 1, 0);
-  mainlayout->addWidget (end,       0, 2, 1, 1, 0);
+  mainlayout->addWidget (pb_add_dir,      0, 0, 1, 1, 0);
+  mainlayout->addWidget (pb_add_file,     0, 1, 1, 1, 0);
+  //mainlayout->addWidget (run,       0, 1, 1, 1, 0);
+  mainlayout->addWidget (pb_about,       0, 2, 1, 1, 0);
   mainlayout->addWidget (pb_set_output,    0, 3, 1, 1, 0);
   mainlayout->addWidget (pb_toggle, 0, 4, 1, 1, 0);
   mainlayout->addWidget (c_suffix,  1, 1, 1, 1, 0);
@@ -112,7 +130,9 @@ MainWindow::MainWindow ()
   mainlayout->addWidget (label,    7, 0, 1, 1, 0);
   mainlayout->addWidget (progress,  7, 4, 1, 1, 0);
   //QObject::connect( scan, SIGNAL( clicked()), this, SLOT(s_scan()));
-  QObject::connect( run, SIGNAL( clicked()), this, SLOT(s_run()));
+  //QObject::connect( run, SIGNAL( clicked()), this, SLOT(s_run()));
+  QObject::connect( pb_add_dir, SIGNAL( clicked()), this, SLOT(s_add_dir()));
+  QObject::connect( pb_add_file, SIGNAL( clicked()), this, SLOT(s_add_file()));
   QObject::connect( pb_set_output, SIGNAL( clicked()), this, SLOT(s_set_output()));
   QObject::connect( pb_toggle, SIGNAL( clicked()), this, SLOT(s_toggle()));
   QObject::connect( c_4gb, SIGNAL(stateChanged(int)), this, SLOT(s_4gb_checked(int)));

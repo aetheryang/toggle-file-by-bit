@@ -39,13 +39,19 @@ class MainWindow:public QWidget
   QProgressBar *progress;
   QLabel* label;
   QString output;
-  QStringList showfile();
+  QStringList ERRORLIST, INFOLIST;
+
+  QStringList showfile( QString path);
+  QString set_suffix(QString filename);
   void toggle(QString filename);
+  void toggle_out(QString filename);
   void toggle_burst(QString filename);
+  void toggle_4gb(QString filename);
   public slots:
-  void s_scan(QListWidgetItem *item);
+  void s_add_dir();
+  void s_add_file();
   void s_toggle();
-  void s_run();
+  void s_about();
   void s_4gb_checked(int state);
   void s_set_output();
   void slot_left_to_right(QListWidgetItem *item);
