@@ -66,11 +66,7 @@ void MainWindow::s_toggle() {
   int i;
   for( i = 0; i < list_right->count(); i++) {
     QString filename(list_right->item(i)->text());
-    if(c_4gb->isChecked())
-      toggle_4gb(filename);
-    else
-      toggle_transfer(filename);
-  return;
+    choose_mode(filename);
   }
   cout << "toggle finished" << endl;
 }
@@ -114,9 +110,10 @@ MainWindow::MainWindow ()
   label = new QLabel("file out to:");
   c_suffix = new QCheckBox("suffix", this);
   c_4gb = new QCheckBox("4gblimt", this);
-  c_suffix->setChecked(1);
-  c_4gb->setChecked(1);
+  c_suffix->setChecked(0);
+  c_4gb->setChecked(0);
   c_suffix->setEnabled(0);
+  c_4gb->setEnabled(0);
   list_right = new QListWidget;
   list_left = new QListWidget;
   QStringList list = showfile(QDir::currentPath());

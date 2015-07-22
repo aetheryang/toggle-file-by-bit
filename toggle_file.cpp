@@ -8,19 +8,20 @@ QStringList MainWindow::showfile(QString path) {
   return list;
 }
 
-QString MainWindow::set_suffix(QString filename) {
-  QString suffix[16] = { ".t0", ".t1", ".t2", ".t3", ".t4", ".t5", ".t6", ".t7"\
-                         ".t8", ".t9", ".ta", ".tb", ".tc", ".td", ".te", ".tf"};
+void MainWindow::choose_mode(QString filename) {
   QString dot_t = ".t";
   if(filename.lastIndexOf(dot_t) == 1)
-    filename.remove( -3, 3);
+    toggle_back(filename);
   else
-    filename.append( ".t0");
-  return filename;
+    if(c_4gb->isChecked())
+      toggle_4gb(filename);
+    else
+      toggle_transfer(filename);
+  return;
 }
 void MainWindow::toggle(QString filename)
 {
-    char readbyte,readbuff[1024];
+    char readbuff[1024];
     int burst_len = 1024;
     qint64 file_size, i, loc = 0,stream_len = 1;
     QFile qfile(filename);
@@ -42,7 +43,7 @@ void MainWindow::toggle(QString filename)
 }
 void MainWindow::toggle_transfer(QString filename)
 {
-  char readbyte,readbuff[1024];
+  char readbuff[1024];
   int burst_len = 1024;
   qint64 file_size, i, loc = 0,stream_len = 1;
   QFile qin(filename);
@@ -59,7 +60,6 @@ void MainWindow::toggle_transfer(QString filename)
   }
   file_size = qin.size();
   cout<< "ok" << endl;
-  cout << set_suffix(filename).toStdString() << endl;
   do {
     stream_len = qin.read( readbuff, burst_len);
     i = stream_len;
@@ -85,7 +85,8 @@ void MainWindow::toggle_4gb(QString filename)
   }
   file_size = qin.size();
   for( file_num = 0; file_num < 16; file_num ++) {
-    QFile qout(output + filename + suffix[file_num]);
+    QString file_out = output + filename + suffix[file_num];
+    QFile qout(file_out);
     if(!qout.open( QIODevice::WriteOnly)) {
       ERRORLIST << filename + " open failed";
       return;
@@ -112,7 +113,7 @@ void MainWindow::toggle_back(QString filename)
                          ".t8", ".t9", ".ta", ".tb", ".tc", ".td", ".te", ".tf"};
   char readbuff[1024];
   int burst_len = 1024;
-  qint64 file_size, file_num, i, loc = 0,stream_len = 1;
+  qint64 file_size = 0, file_num, i, loc = 0,stream_len = 1;
   QFile qout(output + filename.remove(-3, 3));
   if(!qout.open( QIODevice::WriteOnly)) {
     ERRORLIST << filename + " open failed";
@@ -122,6 +123,7 @@ void MainWindow::toggle_back(QString filename)
     QFile qin(filename + suffix[file_num]);
     if(!qin.open( QIODevice::ReadOnly)) {
       ERRORLIST << filename + " open failed";
+      qout.close();
       return;
     }
     file_size += qin.size();

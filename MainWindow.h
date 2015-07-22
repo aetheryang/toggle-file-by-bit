@@ -42,12 +42,12 @@ class MainWindow:public QWidget
   QString output;
   QStringList ERRORLIST, INFOLIST;
 
-  QStringList showfile( QString path);
-  QString set_suffix(QString filename);
-  void toggle       (QString filename);
-  void toggle_transfer(QString filename);
-  void toggle_4gb   (QString filename);
-  void toggle_back   (QString filename);
+  QStringList showfile  (QString path);
+  void choose_mode      (QString filename);
+  void toggle           (QString filename);
+  void toggle_transfer  (QString filename);
+  void toggle_4gb       (QString filename);
+  void toggle_back      (QString filename);
   public slots:
   void s_add_dir();
   void s_add_file();
